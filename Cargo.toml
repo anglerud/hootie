@@ -1,0 +1,13 @@
+[package]
+authors = ["Rikard Anglerud <rikard@anglerud.com>"]
+name = "hootie"
+version = "0.1.0"
+
+[dependencies]
+failure = "0.1.1"
+reqwest = "0.8.2"
+serde = "1.0.26"
+serde_derive = "1.0.26"
+structopt = "0.1.0"
+structopt-derive = "0.1.0"
+termion = "1.5.1"

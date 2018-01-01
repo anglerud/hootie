@@ -18,18 +18,20 @@ use termion::color;
 use termion::cursor;
 
 
-// Then, one alert per line until max lines
 // TODO: sort by severity.
 // TODO: Docstings
+//       question - how does one doc structs?
 // TODO: some proper documentation, inc /// lines.
+//       question - how does one doc the module?
+// TODO: Proper Readme with a screenshot.
 // TODO: get rid of the unwraps in the formatting?
 
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "hootie", about = "Display Alerta alerts in the terminal")]
 struct Opt {
-    /// An argument of type string, with a default value.
-    #[structopt(long = "alerta-utl", help = "Url to Alerta",
+    /// URL to Alerta, with query paramters. Defaults to localhost.
+    #[structopt(long = "alerta-url", help = "Url to Alerta",
                 default_value = "http://localhost:8080")]
     url: String,
 }
@@ -53,6 +55,7 @@ struct Alert {
 }
 
 impl fmt::Display for Alert {
+    /// Custom formatter for Alert - page severity alerts are red.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let fg = match self.severity.as_ref() {
             "warn" => format!("{}", color::Fg(color::Yellow)),
@@ -66,6 +69,7 @@ impl fmt::Display for Alert {
 }
 
 
+/// Request the alerts from Alerta via http.
 fn get_alerts(opt: &Opt) -> Result<Alerts, Error> {
     let mut response = reqwest::get(&opt.url)?;
 
@@ -74,6 +78,7 @@ fn get_alerts(opt: &Opt) -> Result<Alerts, Error> {
 }
 
 
+/// Show the alerts in the terminal.
 fn display(alerts: Alerts) {
     let mut screen = AlternateScreen::from(stdout());
 

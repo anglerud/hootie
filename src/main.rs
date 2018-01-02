@@ -48,10 +48,10 @@ struct Alerts {
 // And, implement a From or similar to automatically do a conversion?
 #[derive(Deserialize, Debug)]
 struct Alert {
-    name: String,
+    event: String,
     resource: String,
     severity: String,
-    time: String,
+    // fired_time: String,
 }
 
 impl fmt::Display for Alert {
@@ -64,7 +64,7 @@ impl fmt::Display for Alert {
         };
         let reset = color::Fg(color::Reset);
 
-        write!(f, "{}{} : {}{}", fg, self.name, self.resource, reset)
+        write!(f, "{}{} : {}{}", fg, self.event, self.resource, reset)
     }
 }
 
@@ -82,7 +82,7 @@ fn get_alerts(opt: &Opt) -> Result<Alerts, Error> {
 fn display(alerts: Alerts) {
     let mut screen = AlternateScreen::from(stdout());
 
-    write!(screen, "{}Alerta alerts\n\n", cursor::Goto(0, 0)).unwrap();
+    write!(screen, "{}Alerta alerts\n\n", cursor::Goto(1, 1)).unwrap();
 
     if alerts.alerts.len() == 0 {
         write!(screen, "{}No alerts, all is OK! 😌{}", color::Fg(color::Green), color::Fg(color::Reset)).unwrap();

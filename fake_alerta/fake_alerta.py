@@ -8,13 +8,13 @@ from aiohttp import web
 
 ALERTS = [
     {
-        'name': 'PantsOnFire',
+        'event': 'PantsOnFire',
         'resource': 'pants',
         'severity': 'page',
         'time': '2017-12-30 13:00:00'
     },
     {
-        'name': 'PantsSmouldering',
+        'event': 'PantsSmouldering',
         'resource': 'pants',
         'severity': 'warn',
         'time': '2017-12-30 12:00:00'

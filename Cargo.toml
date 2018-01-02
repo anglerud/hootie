@@ -1,7 +1,17 @@
 [package]
 authors = ["Rikard Anglerud <rikard@anglerud.com>"]
 name = "hootie"
-version = "0.1.0"
+version = "0.5.0"
+description = """
+Terminal viewer of Alerta alerts.
+"""
+homepage = "https://github.com/anglerud/hootie"
+repository = "https://github.com/anglerud/hootie"
+readme = "README.md"
+keywords = ["alerta", "alerting"]
+categories = ["command-line-interface"]
+license = "GPL-3.0-or-later"
+maintenance = { status = "actively-developed" }
 
 [dependencies]
 failure = "0.1.1"

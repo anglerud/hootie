@@ -12,3 +12,4 @@ Cargo.lock
 
 # Vim
 *.swp
+*.un~

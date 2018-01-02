@@ -12,6 +12,9 @@ keywords = ["alerta", "alerting"]
 categories = ["command-line-interface"]
 license = "GPL-3.0-or-later"
 maintenance = { status = "actively-developed" }
+exclude = [
+    "fake_alerta/*"
+]
 
 [dependencies]
 failure = "0.1.1"

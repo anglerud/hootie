@@ -10,7 +10,7 @@ repository = "https://github.com/anglerud/hootie"
 readme = "README.md"
 keywords = ["alerta", "alerting"]
 categories = ["command-line-interface"]
-license = "GPL-3.0-or-later"
+license = "GPL-3.0"
 maintenance = { status = "actively-developed" }
 exclude = [
     "fake_alerta/*"

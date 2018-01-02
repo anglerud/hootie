@@ -16,6 +16,9 @@ exclude = [
     "fake_alerta/*"
 ]
 
+[badges]
+travis-ci = { repository = "anglerud/hootie" }
+
 [dependencies]
 failure = "0.1.1"
 reqwest = "0.8.2"

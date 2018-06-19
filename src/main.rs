@@ -50,6 +50,9 @@ struct Alerts {
 struct Alert {
     event: String,
     resource: String,
+    // HMM - to sort,  def need that enum I think. 
+    // Need to define an Eq - or maybe derive eq will just work?
+    // Need a severity enum with derive Eq? or Ord?
     severity: String,
     // fired_time: String,
 }

@@ -8,15 +8,14 @@ extern crate structopt_derive;
 extern crate termion;
 
 use std::fmt;
-use std::io::{Write, stdout};
+use std::io::{stdout, Write};
 use std::{thread, time};
 
 use failure::Error;
 use structopt::StructOpt;
-use termion::screen::AlternateScreen;
 use termion::color;
 use termion::cursor;
-
+use termion::screen::AlternateScreen;
 
 // TODO: sort by severity.
 // TODO: Docstings
@@ -26,22 +25,25 @@ use termion::cursor;
 // TODO: Proper Readme with a screenshot.
 // TODO: get rid of the unwraps in the formatting?
 
-
 #[derive(StructOpt, Debug)]
-#[structopt(name = "hootie", about = "Display Alerta alerts in the terminal")]
+#[structopt(
+    name = "hootie",
+    about = "Display Alerta alerts in the terminal"
+)]
 struct Opt {
     /// URL to Alerta, with query paramters. Defaults to localhost.
-    #[structopt(long = "alerta-url", help = "Url to Alerta",
-                default_value = "http://localhost:8080")]
+    #[structopt(
+        long = "alerta-url",
+        help = "Url to Alerta",
+        default_value = "http://localhost:8080"
+    )]
     url: String,
 }
-
 
 #[derive(Deserialize, Debug)]
 struct Alerts {
     alerts: Vec<Alert>,
 }
-
 
 // TODO: new Alert structure, then make this JsonAlert
 //       and severity can then be an enum, time a real time, etc?
@@ -50,7 +52,7 @@ struct Alerts {
 struct Alert {
     event: String,
     resource: String,
-    // HMM - to sort,  def need that enum I think. 
+    // HMM - to sort,  def need that enum I think.
     // Need to define an Eq - or maybe derive eq will just work?
     // Need a severity enum with derive Eq? or Ord?
     severity: String,
@@ -63,14 +65,13 @@ impl fmt::Display for Alert {
         let fg = match self.severity.as_ref() {
             "warn" => format!("{}", color::Fg(color::Yellow)),
             "page" => format!("{}", color::Fg(color::Red)),
-            _ => format!("{}", color::Fg(color::White))
+            _ => format!("{}", color::Fg(color::White)),
         };
         let reset = color::Fg(color::Reset);
 
         write!(f, "{}{} : {}{}", fg, self.event, self.resource, reset)
     }
 }
-
 
 /// Request the alerts from Alerta via http.
 fn get_alerts(opt: &Opt) -> Result<Alerts, Error> {
@@ -80,7 +81,6 @@ fn get_alerts(opt: &Opt) -> Result<Alerts, Error> {
     Ok(alerts)
 }
 
-
 /// Show the alerts in the terminal.
 fn display(alerts: Alerts) {
     let mut screen = AlternateScreen::from(stdout());
@@ -88,7 +88,12 @@ fn display(alerts: Alerts) {
     write!(screen, "{}Alerta alerts\n\n", cursor::Goto(1, 1)).unwrap();
 
     if alerts.alerts.len() == 0 {
-        write!(screen, "{}No alerts, all is OK! 😌{}", color::Fg(color::Green), color::Fg(color::Reset)).unwrap();
+        write!(
+            screen,
+            "{}No alerts, all is OK! 😌{}",
+            color::Fg(color::Green),
+            color::Fg(color::Reset)
+        ).unwrap();
     } else {
         for alert in alerts.alerts {
             // XXX: write! returns a result. I don't much care if it
@@ -98,7 +103,6 @@ fn display(alerts: Alerts) {
     }
     screen.flush().unwrap();
 }
-
 
 fn main() {
     let opt = Opt::from_args();

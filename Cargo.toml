@@ -11,6 +11,7 @@ readme = "README.md"
 keywords = ["alerta", "alerting"]
 categories = ["command-line-interface"]
 license = "GPL-3.0"
+edition = "2018"
 exclude = [
     "fake_alerta/*"
 ]

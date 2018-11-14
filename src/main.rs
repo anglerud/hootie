@@ -3,7 +3,6 @@ extern crate reqwest;
 #[macro_use]
 extern crate serde_derive;
 extern crate structopt;
-#[macro_use]
 extern crate structopt_derive;
 extern crate termion;
 
@@ -26,10 +25,7 @@ use termion::screen::AlternateScreen;
 // TODO: get rid of the unwraps in the formatting?
 
 #[derive(StructOpt, Debug)]
-#[structopt(
-    name = "hootie",
-    about = "Display Alerta alerts in the terminal"
-)]
+#[structopt(name = "hootie", about = "Display Alerta alerts in the terminal")]
 struct Opt {
     /// URL to Alerta, with query paramters. Defaults to localhost.
     #[structopt(
@@ -93,7 +89,8 @@ fn display(alerts: Alerts) {
             "{}No alerts, all is OK! 😌{}",
             color::Fg(color::Green),
             color::Fg(color::Reset)
-        ).unwrap();
+        )
+        .unwrap();
     } else {
         for alert in alerts.alerts {
             // XXX: write! returns a result. I don't much care if it

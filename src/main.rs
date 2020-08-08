@@ -71,7 +71,7 @@ impl fmt::Display for Alert {
 
 /// Request the alerts from Alerta via http.
 fn get_alerts(opt: &Opt) -> Result<Alerts, Error> {
-    let mut response = reqwest::get(&opt.url)?;
+    let response = reqwest::blocking::get(&opt.url)?;
 
     let alerts: Alerts = response.json()?;
     Ok(alerts)

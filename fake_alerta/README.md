@@ -6,12 +6,10 @@ might come from Alerta. I used this to test Hootie.
 
 ## Install
 
-This uses Pipenv to manage its dependencies. Install them and activate them
-like this:
+This uses [Poetry](https://python-poetry.org/) to manage its dependencies.
 
 ```bash
-$ pipenv install
-$ pipenv shell
+$ poetry install
 ```
 
 Note that this requires Python 3 - it won't run with Python 2.
@@ -19,8 +17,10 @@ Note that this requires Python 3 - it won't run with Python 2.
 
 ## Usage
 
-Run it, it'll start a webserver on port 8080.
+Run with poetry:
 
 ```bash
-$ ./fake_alerta.py
+$ poetry run fake_alerta
 ```
+
+It'll start a webserver on port 8080.

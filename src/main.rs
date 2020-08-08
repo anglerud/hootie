@@ -1,16 +1,10 @@
-extern crate reqwest;
-#[macro_use]
-extern crate serde_derive;
-extern crate structopt;
-extern crate structopt_derive;
-extern crate termion;
-
 use std::fmt;
 use std::io::{stdout, Write};
 use std::{thread, time};
 
 use anyhow::Result;
 use structopt::StructOpt;
+use serde::Deserialize;
 use termion::color;
 use termion::cursor;
 use termion::screen::AlternateScreen;

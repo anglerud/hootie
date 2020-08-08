@@ -22,7 +22,6 @@ use termion::screen::AlternateScreen;
 // TODO: some proper documentation, inc /// lines.
 //       question - how does one doc the module?
 // TODO: Proper Readme with a screenshot.
-// TODO: get rid of the unwraps in the formatting?
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "hootie", about = "Display Alerta alerts in the terminal")]
@@ -78,10 +77,10 @@ fn get_alerts(opt: &Opt) -> Result<Alerts, Error> {
 }
 
 /// Show the alerts in the terminal.
-fn display(alerts: Alerts) {
+fn display(alerts: Alerts) -> std::io::Result<()> {
     let mut screen = AlternateScreen::from(stdout());
 
-    write!(screen, "{}Alerta alerts\n\n", cursor::Goto(1, 1)).unwrap();
+    write!(screen, "{}Alerta alerts\n\n", cursor::Goto(1, 1))?;
 
     if alerts.alerts.is_empty() {
         write!(
@@ -93,22 +92,20 @@ fn display(alerts: Alerts) {
         .unwrap();
     } else {
         for alert in alerts.alerts {
-            // XXX: write! returns a result. I don't much care if it
-            //      failed, what do I do? unwrap() silences it...
-            writeln!(screen, "{}", alert).unwrap();
+            writeln!(screen, "{}", alert)?;
         }
     }
-    screen.flush().unwrap();
+    screen.flush()
 }
 
-fn main() {
+fn main() -> std::io::Result<()> {
     let opt = Opt::from_args();
 
     loop {
         let alerts_res = get_alerts(&opt);
 
         if let Ok(alerts) = alerts_res {
-            display(alerts);
+            display(alerts)?;
         } else {
             // TODO: Use env_logger?
             println!("ERROR: {:?}", alerts_res);

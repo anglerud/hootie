@@ -1,4 +1,3 @@
-extern crate failure;
 extern crate reqwest;
 #[macro_use]
 extern crate serde_derive;
@@ -10,7 +9,7 @@ use std::fmt;
 use std::io::{stdout, Write};
 use std::{thread, time};
 
-use failure::Error;
+use anyhow::Result;
 use structopt::StructOpt;
 use termion::color;
 use termion::cursor;
@@ -22,6 +21,7 @@ use termion::screen::AlternateScreen;
 // TODO: some proper documentation, inc /// lines.
 //       question - how does one doc the module?
 // TODO: Proper Readme with a screenshot.
+// TODO: clear screen before first loop
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "hootie", about = "Display Alerta alerts in the terminal")]
@@ -69,7 +69,7 @@ impl fmt::Display for Alert {
 }
 
 /// Request the alerts from Alerta via http.
-fn get_alerts(opt: &Opt) -> Result<Alerts, Error> {
+fn get_alerts(opt: &Opt) -> Result<Alerts> {
     let response = reqwest::blocking::get(&opt.url)?;
 
     let alerts: Alerts = response.json()?;

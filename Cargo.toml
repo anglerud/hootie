@@ -20,7 +20,7 @@ exclude = [
 travis-ci = { repository = "anglerud/hootie" }
 
 [dependencies]
-failure = "0.1.8"
+anyhow = "1.0.32"
 reqwest = { version = "0.10.7", features = ["blocking", "json"] }
 serde = "1.0.114"
 serde_derive = "1.0.114"

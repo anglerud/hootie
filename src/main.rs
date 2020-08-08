@@ -83,7 +83,7 @@ fn display(alerts: Alerts) {
 
     write!(screen, "{}Alerta alerts\n\n", cursor::Goto(1, 1)).unwrap();
 
-    if alerts.alerts.len() == 0 {
+    if alerts.alerts.is_empty() {
         write!(
             screen,
             "{}No alerts, all is OK! 😌{}",
@@ -95,7 +95,7 @@ fn display(alerts: Alerts) {
         for alert in alerts.alerts {
             // XXX: write! returns a result. I don't much care if it
             //      failed, what do I do? unwrap() silences it...
-            write!(screen, "{}\n", alert).unwrap();
+            writeln!(screen, "{}", alert).unwrap();
         }
     }
     screen.flush().unwrap();

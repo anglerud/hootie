@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::fmt;
 use std::io::{stdout, Write};
 use std::{thread, time};
@@ -10,11 +11,13 @@ use termion::cursor;
 use termion::screen::AlternateScreen;
 
 // TODO: sort by severity.
+//       Think this requires an enum for severity maybe
+//       and then also wrapping the Json alert, *or* getting
+//       serde to insert my severity enum? That seems hard.
 // TODO: Docstings
 //       question - how does one doc structs?
 // TODO: some proper documentation, inc /// lines.
 //       question - how does one doc the module?
-// TODO: Proper Readme with a screenshot.
 // TODO: clear screen before first loop
 
 #[derive(StructOpt, Debug)]
@@ -34,6 +37,14 @@ struct Alerts {
     alerts: Vec<Alert>,
 }
 
+#[serde(rename_all = "snake_case")]
+#[derive(Deserialize, Debug)]
+enum Severity {
+    Page,
+    Warn,
+    Other
+}
+
 // TODO: new Alert structure, then make this JsonAlert
 //       and severity can then be an enum, time a real time, etc?
 // And, implement a From or similar to automatically do a conversion?
@@ -44,16 +55,16 @@ struct Alert {
     // HMM - to sort,  def need that enum I think.
     // Need to define an Eq - or maybe derive eq will just work?
     // Need a severity enum with derive Eq? or Ord?
-    severity: String,
-    // fired_time: String,
+    // TODO: get serde to deserialise to a struct
+    severity: Severity
 }
 
 impl fmt::Display for Alert {
     /// Custom formatter for Alert - page severity alerts are red.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let fg = match self.severity.as_ref() {
-            "warn" => format!("{}", color::Fg(color::Yellow)),
-            "page" => format!("{}", color::Fg(color::Red)),
+        let fg = match self.severity {
+            Severity::Page => format!("{}", color::Fg(color::Red)),
+            Severity::Warn => format!("{}", color::Fg(color::Yellow)),
             _ => format!("{}", color::Fg(color::White)),
         };
         let reset = color::Fg(color::Reset);

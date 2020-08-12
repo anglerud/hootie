@@ -1,4 +1,3 @@
-use std::cmp::Ordering;
 use std::fmt;
 use std::io::{stdout, Write};
 use std::{thread, time};
@@ -10,10 +9,7 @@ use termion::color;
 use termion::cursor;
 use termion::screen::AlternateScreen;
 
-// TODO: sort by severity.
-//       Think this requires an enum for severity maybe
-//       and then also wrapping the Json alert, *or* getting
-//       serde to insert my severity enum? That seems hard.
+// TODO: test the sort by severity.
 // TODO: Docstings
 //       question - how does one doc structs?
 // TODO: some proper documentation, inc /// lines.
@@ -38,24 +34,17 @@ struct Alerts {
 }
 
 #[serde(rename_all = "snake_case")]
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
 enum Severity {
     Page,
     Warn,
     Other
 }
 
-// TODO: new Alert structure, then make this JsonAlert
-//       and severity can then be an enum, time a real time, etc?
-// And, implement a From or similar to automatically do a conversion?
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
 struct Alert {
     event: String,
     resource: String,
-    // HMM - to sort,  def need that enum I think.
-    // Need to define an Eq - or maybe derive eq will just work?
-    // Need a severity enum with derive Eq? or Ord?
-    // TODO: get serde to deserialise to a struct
     severity: Severity
 }
 
@@ -77,7 +66,8 @@ impl fmt::Display for Alert {
 fn get_alerts(opt: &Opt) -> Result<Alerts> {
     let response = reqwest::blocking::get(&opt.url)?;
 
-    let alerts: Alerts = response.json()?;
+    let mut alerts: Alerts = response.json()?;
+    alerts.alerts.sort();
     Ok(alerts)
 }
 

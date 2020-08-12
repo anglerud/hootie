@@ -9,7 +9,7 @@ use termion::color;
 use termion::cursor;
 use termion::screen::AlternateScreen;
 
-// TODO: sort by severity.
+// TODO: test that sort by severity works
 // TODO: Docstings
 //       question - how does one doc structs?
 // TODO: some proper documentation, inc /// lines.
@@ -34,26 +34,27 @@ struct Alerts {
     alerts: Vec<Alert>,
 }
 
-// TODO: new Alert structure, then make this JsonAlert
-//       and severity can then be an enum, time a real time, etc?
-// And, implement a From or similar to automatically do a conversion?
-#[derive(Deserialize, Debug)]
+#[serde(rename_all = "snake_case")]
+#[derive(Deserialize, Debug, Eq, PartialEq, PartialOrd, Ord)]
+enum Severity {
+    Page,
+    Warn,
+    Other
+}
+
+#[derive(Deserialize, Debug, Eq, PartialEq, PartialOrd, Ord)]
 struct Alert {
     event: String,
     resource: String,
-    // HMM - to sort,  def need that enum I think.
-    // Need to define an Eq - or maybe derive eq will just work?
-    // Need a severity enum with derive Eq? or Ord?
-    severity: String,
-    // fired_time: String,
+    severity: Severity
 }
 
 impl fmt::Display for Alert {
     /// Custom formatter for Alert - page severity alerts are red.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let fg = match self.severity.as_ref() {
-            "warn" => format!("{}", color::Fg(color::Yellow)),
-            "page" => format!("{}", color::Fg(color::Red)),
+        let fg = match self.severity {
+            Severity::Warn => format!("{}", color::Fg(color::Yellow)),
+            Severity::Page => format!("{}", color::Fg(color::Red)),
             _ => format!("{}", color::Fg(color::White)),
         };
         let reset = color::Fg(color::Reset);
@@ -62,11 +63,13 @@ impl fmt::Display for Alert {
     }
 }
 
+
 /// Request the alerts from Alerta via http.
 fn get_alerts(opt: &Opt) -> Result<Alerts> {
     let response = reqwest::blocking::get(&opt.url)?;
 
-    let alerts: Alerts = response.json()?;
+    let mut alerts: Alerts = response.json()?;
+    alerts.alerts.sort();
     Ok(alerts)
 }
 

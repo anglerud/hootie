@@ -1,3 +1,16 @@
+//! Hootie - the terminal view of Alerta alerts.
+//!
+//! See your alerts in the terminal. An example of Hootie
+//! in action:
+//!
+//! ![Hootie's main view](https://github.com/anglerud/hootie/raw/main/hootie.png)
+//!
+//! Usage:
+//!
+//!     hootie --alerta-url="http://your-alerta-url/api/alerts?status=open&service=infra"
+//!
+//! Note that you can select things like status and service via the URL to filter
+//! for the alerts you're interested in.
 use std::fmt;
 use std::io::{stdout, Write};
 use std::{thread, time};
@@ -10,12 +23,11 @@ use termion::cursor;
 use termion::screen::AlternateScreen;
 
 // TODO: test the sort by severity.
-// TODO: Docstings
-//       question - how does one doc structs?
-// TODO: some proper documentation, inc /// lines.
-//       question - how does one doc the module?
 // TODO: clear screen before first loop
 
+/// Configuration struct
+///
+/// StructOpt struct containig Hootie's command line parameters.
 #[derive(StructOpt, Debug)]
 #[structopt(name = "hootie", about = "Display Alerta alerts in the terminal")]
 struct Opt {
@@ -28,11 +40,14 @@ struct Opt {
     url: String,
 }
 
+/// Alerts is the JSON struct returned from the Alerta API.
+/// Importantly, it contains a list of Alert.
 #[derive(Deserialize, Debug)]
 struct Alerts {
     alerts: Vec<Alert>,
 }
 
+/// Alert severities - most severe first.
 #[serde(rename_all = "snake_case")]
 #[derive(Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
 enum Severity {
@@ -41,15 +56,18 @@ enum Severity {
     Other
 }
 
+/// Alert is the JSON struct returned from the Alerta API
+/// that represents an individual alert.
 #[derive(Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
 struct Alert {
+    severity: Severity,
     event: String,
-    resource: String,
-    severity: Severity
+    resource: String
 }
 
+/// Custom formatter for Alert - page severity alerts are red,
+/// warnings yellow.
 impl fmt::Display for Alert {
-    /// Custom formatter for Alert - page severity alerts are red.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let fg = match self.severity {
             Severity::Page => format!("{}", color::Fg(color::Red)),
@@ -62,8 +80,10 @@ impl fmt::Display for Alert {
     }
 }
 
-/// Request the alerts from Alerta via http.
+/// Request alerts from Alerta via an http GET.
 fn get_alerts(opt: &Opt) -> Result<Alerts> {
+    // FIXME: how to test this - create a trait for getting a url?
+    // 
     let response = reqwest::blocking::get(&opt.url)?;
 
     let mut alerts: Alerts = response.json()?;

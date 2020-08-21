@@ -86,8 +86,7 @@ fn get_alerts(opt: &Opt) -> Result<Alerts> {
     // 
     let response = reqwest::blocking::get(&opt.url)?;
 
-    let mut alerts: Alerts = response.json()?;
-    alerts.alerts.sort();
+    let alerts: Alerts = response.json()?;
     Ok(alerts)
 }
 
@@ -119,7 +118,8 @@ fn main() -> std::io::Result<()> {
     loop {
         let alerts_res = get_alerts(&opt);
 
-        if let Ok(alerts) = alerts_res {
+        if let Ok(mut alerts) = alerts_res {
+            alerts.alerts.sort();
             display(alerts)?;
         } else {
             // TODO: Use env_logger?

@@ -15,14 +15,14 @@ use std::fmt;
 use std::io::{stdout, Write};
 use std::{thread, time};
 
-use anyhow::Result;
+use color_eyre::eyre::{WrapErr, Result};
 use structopt::StructOpt;
 use serde::Deserialize;
 use termion::color;
 use termion::cursor;
 use termion::screen::AlternateScreen;
 
-// TODO: test the sort by severity.
+// TODO: Use env_logger (or similar) instead of println!
 // TODO: clear screen before first loop
 
 /// Configuration struct
@@ -49,16 +49,15 @@ struct Alerts {
 
 /// Alert severities - most severe first.
 #[serde(rename_all = "snake_case")]
-#[derive(Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
 enum Severity {
     Page,
     Warn,
     Other
 }
 
-/// Alert is the JSON struct returned from the Alerta API
-/// that represents an individual alert.
-#[derive(Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
+/// Alert represents one individual alert.
+#[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
 struct Alert {
     severity: Severity,
     event: String,
@@ -82,11 +81,11 @@ impl fmt::Display for Alert {
 
 /// Request alerts from Alerta via an http GET.
 fn get_alerts(opt: &Opt) -> Result<Alerts> {
-    // FIXME: how to test this - create a trait for getting a url?
-    // 
-    let response = reqwest::blocking::get(&opt.url)?;
+    let response = reqwest::blocking::get(&opt.url)
+        .wrap_err("Could not contact Alerta.")?;
 
-    let alerts: Alerts = response.json()?;
+    let alerts: Alerts = response.json()
+        .wrap_err("Could not understand the response from Alerta.")?;
     Ok(alerts)
 }
 
@@ -112,7 +111,57 @@ fn display(alerts: Alerts) -> std::io::Result<()> {
     screen.flush()
 }
 
-fn main() -> std::io::Result<()> {
+
+#[cfg(test)]
+mod tests {
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
+
+    #[test]
+    fn test_alert_sort_order() {
+        // Two alerts with the same resource and events
+        // We check that the severity sorts one above the
+        // other.
+        let crit_alert = Alert{
+            severity: Severity::Page,
+            resource: "A".into(),
+            event: "A".into()
+        };
+        let warn_alert = Alert{
+            severity: Severity::Warn,
+            resource: "A".into(),
+            event: "A".into()
+        };
+        let crit_alert_2 = crit_alert.clone();
+        let warn_alert_2 = warn_alert.clone();
+        let mut alerts = vec![warn_alert, crit_alert];
+        alerts.sort();
+
+        let expected = vec![crit_alert_2, warn_alert_2];
+        assert_eq!(alerts, expected);
+    }
+
+    #[test]
+    fn test_page_alert_format() {
+        // [38;5;<color>m - set foreground color
+        // In 256 color mode, color 1 is red.
+        // \u{1b}[39m - reset colors.
+        // And our expected value is "A : A"
+        let expected = "\u{1b}[38;5;1mA : A\u{1b}[39m";
+
+        let crit_alert = Alert{
+            severity: Severity::Page,
+            resource: "A".into(),
+            event: "A".into()
+        };
+
+        assert_eq!(&format!("{}", crit_alert), expected);
+    }
+
+}
+
+fn main() -> Result<()> {
+    color_eyre::install()?;
     let opt = Opt::from_args();
 
     loop {
@@ -122,7 +171,6 @@ fn main() -> std::io::Result<()> {
             alerts.alerts.sort();
             display(alerts)?;
         } else {
-            // TODO: Use env_logger?
             println!("ERROR: {:?}", alerts_res);
         }
 

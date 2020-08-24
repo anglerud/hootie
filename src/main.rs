@@ -23,7 +23,6 @@ use termion::cursor;
 use termion::screen::AlternateScreen;
 
 // TODO: Use env_logger (or similar) instead of println!
-// TODO: clear screen before first loop
 
 /// Configuration struct
 ///
@@ -93,7 +92,7 @@ fn get_alerts(opt: &Opt) -> Result<Alerts> {
 fn display(alerts: Alerts) -> std::io::Result<()> {
     let mut screen = AlternateScreen::from(stdout());
 
-    write!(screen, "{}Alerta alerts\n\n", cursor::Goto(1, 1))?;
+    write!(screen, "{}{}Alerta alerts\n\n", termion::clear::All, cursor::Goto(1, 1))?;
 
     if alerts.alerts.is_empty() {
         write!(

@@ -22,7 +22,10 @@ use termion::color;
 use termion::cursor;
 use termion::screen::AlternateScreen;
 
+static COMPRESSED_DEPENDENCY_LIST: &[u8] = auditable::inject_dependency_list!();
+
 // TODO: Use env_logger (or similar) instead of println!
+// Just for delta
 
 /// Configuration struct
 ///
@@ -162,6 +165,7 @@ mod tests {
 fn main() -> Result<()> {
     color_eyre::install()?;
     let opt = Opt::from_args();
+    println!("{}", COMPRESSED_DEPENDENCY_LIST[0]);
 
     loop {
         let alerts_res = get_alerts(&opt);

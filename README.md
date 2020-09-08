@@ -58,3 +58,11 @@ If you use it, then you can invoke Hootie like this:
 ```bash
 $ hootie --alerta-url='http://localhost:8080'
 ```
+
+
+## Rust-audit info
+
+Builds embed dependency information into the binaries using
+[rust-audit](https://github.com/Shnatsel/rust-audit). This should make it
+possible to see if any advisories have been released against any packages
+Hootie uses.

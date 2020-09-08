@@ -16,13 +16,21 @@ exclude = [
     "fake_alerta/*"
 ]
 
+# Build script is required for `auditable-build`
+build = "build.rs"
+
 [badges]
 travis-ci = { repository = "anglerud/hootie" }
 
 [dependencies]
+auditable = "0.1"
 color-eyre = "0.5.1"
 reqwest = { version = "0.10.7", features = ["blocking", "json"] }
 serde = { version = "1.0.114", features = ["derive"] }
 structopt = "0.3.16"
 structopt-derive = "0.4.9"
 termion = "1.5.5"
+
+
+[build-dependencies]
+auditable-build = "0.1"

@@ -2,8 +2,6 @@
 
 Terminal view of Alerta alerts.
 
-[![Build Status](https://travis-ci.org/anglerud/hootie.svg?branch=master)](https://travis-ci.org/anglerud/hootie)
-
 
 If there are alerts:
 

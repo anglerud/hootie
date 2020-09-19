@@ -15,9 +15,9 @@ use std::fmt;
 use std::io::{stdout, Write};
 use std::{thread, time};
 
-use color_eyre::eyre::{WrapErr, Result};
-use structopt::StructOpt;
+use color_eyre::eyre::{Result, WrapErr};
 use serde::Deserialize;
+use structopt::StructOpt;
 use termion::color;
 use termion::cursor;
 use termion::screen::AlternateScreen;
@@ -55,7 +55,7 @@ struct Alerts {
 enum Severity {
     Page,
     Warn,
-    Other
+    Other,
 }
 
 /// Alert represents one individual alert.
@@ -63,7 +63,7 @@ enum Severity {
 struct Alert {
     severity: Severity,
     event: String,
-    resource: String
+    resource: String,
 }
 
 /// Custom formatter for Alert - page severity alerts are red,
@@ -83,10 +83,10 @@ impl fmt::Display for Alert {
 
 /// Request alerts from Alerta via an http GET.
 fn get_alerts(opt: &Opt) -> Result<Alerts> {
-    let response = reqwest::blocking::get(&opt.url)
-        .wrap_err("Could not contact Alerta.")?;
+    let response = reqwest::blocking::get(&opt.url).wrap_err("Could not contact Alerta.")?;
 
-    let alerts: Alerts = response.json()
+    let alerts: Alerts = response
+        .json()
         .wrap_err("Could not understand the response from Alerta.")?;
     Ok(alerts)
 }
@@ -95,7 +95,12 @@ fn get_alerts(opt: &Opt) -> Result<Alerts> {
 fn display(alerts: Alerts) -> std::io::Result<()> {
     let mut screen = AlternateScreen::from(stdout());
 
-    write!(screen, "{}{}Alerta alerts\n\n", termion::clear::All, cursor::Goto(1, 1))?;
+    write!(
+        screen,
+        "{}{}Alerta alerts\n\n",
+        termion::clear::All,
+        cursor::Goto(1, 1)
+    )?;
 
     if alerts.alerts.is_empty() {
         write!(
@@ -113,7 +118,6 @@ fn display(alerts: Alerts) -> std::io::Result<()> {
     screen.flush()
 }
 
-
 #[cfg(test)]
 mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
@@ -124,15 +128,15 @@ mod tests {
         // Two alerts with the same resource and events
         // We check that the severity sorts one above the
         // other.
-        let crit_alert = Alert{
+        let crit_alert = Alert {
             severity: Severity::Page,
             resource: "A".into(),
-            event: "A".into()
+            event: "A".into(),
         };
-        let warn_alert = Alert{
+        let warn_alert = Alert {
             severity: Severity::Warn,
             resource: "A".into(),
-            event: "A".into()
+            event: "A".into(),
         };
         let crit_alert_2 = crit_alert.clone();
         let warn_alert_2 = warn_alert.clone();
@@ -151,15 +155,14 @@ mod tests {
         // And our expected value is "A : A"
         let expected = "\u{1b}[38;5;1mA : A\u{1b}[39m";
 
-        let crit_alert = Alert{
+        let crit_alert = Alert {
             severity: Severity::Page,
             resource: "A".into(),
-            event: "A".into()
+            event: "A".into(),
         };
 
         assert_eq!(&format!("{}", crit_alert), expected);
     }
-
 }
 
 fn main() -> Result<()> {

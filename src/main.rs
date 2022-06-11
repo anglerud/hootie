@@ -50,8 +50,8 @@ struct Alerts {
 }
 
 /// Alert severities - most severe first.
-#[serde(rename_all = "snake_case")]
 #[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
+#[serde(rename_all = "snake_case")]
 enum Severity {
     Page,
     Warn,
